@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f5f5f7;
+  --surface: #ffffff;
+  --surface-2: #fbfbfd;
+  --foreground: #1d1d1f;
+  --muted: #6e6e73;
+  --border: #e5e5ea;
+  --primary: #3b5bfd;
+  --primary-foreground: #ffffff;
+  --accent: #0a84ff;
+  --gold: #c9a24b;
+  --success: #12b76a;
+  --warning: #f79009;
+  --danger: #f04438;
+  --radius: 1rem;
+}
+
+.dark {
+  --background: #0b0b0d;
+  --surface: #141416;
+  --surface-2: #1a1a1d;
+  --foreground: #f5f5f7;
+  --muted: #98989d;
+  --border: #2c2c2e;
+  --primary: #5c7cff;
+  --primary-foreground: #0b0b0d;
+  --accent: #409cff;
+  --gold: #d9b968;
+  --success: #32d583;
+  --warning: #fdb022;
+  --danger: #f97066;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-gold: var(--gold);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --radius-card: var(--radius);
+  --font-sans: var(--font-inter);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* Scrollbars, refined */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted) 35%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.card-shadow {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px -8px rgba(0, 0, 0, 0.08);
+}
+
+.dark .card-shadow {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 8px 24px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* Rich text content (temario, descripción, testimonios) */
+.prose-content h1,
+.prose-content h2,
+.prose-content h3 {
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.4em;
+}
+.prose-content p {
+  margin-bottom: 0.85em;
+  line-height: 1.7;
+}
+.prose-content ul {
+  list-style: disc;
+  padding-left: 1.4em;
+  margin-bottom: 0.85em;
+}
+.prose-content ol {
+  list-style: decimal;
+  padding-left: 1.4em;
+  margin-bottom: 0.85em;
+}
+.prose-content a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.prose-content strong {
+  font-weight: 600;
+}
+
+.ProseMirror {
+  outline: none;
+  min-height: 8rem;
+}
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted);
+  pointer-events: none;
+  height: 0;
+}
