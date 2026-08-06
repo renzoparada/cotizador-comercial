@@ -150,6 +150,18 @@ export function PdfProposalContent({ proposal, qrDataUrl }: { proposal: Proposal
               {header.trainerName && <p style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>{header.trainerName}</p>}
               {content.facilitator.bio && <p style={{ fontSize: 12, color: "#6e6e73", marginTop: 6 }}>{content.facilitator.bio}</p>}
               {content.facilitator.experiencia && <p style={{ fontSize: 12, marginTop: 6 }}>{content.facilitator.experiencia}</p>}
+              {content.facilitator.certificaciones.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+                  {content.facilitator.certificaciones.map((c, i) => (
+                    <span
+                      key={i}
+                      style={{ fontSize: 11, background: "#fbf3e0", color: "#b8860b", borderRadius: 999, padding: "5px 12px" }}
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </PdfSection>

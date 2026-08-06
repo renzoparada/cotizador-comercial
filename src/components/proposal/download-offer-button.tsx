@@ -6,6 +6,7 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PdfProposalContent } from "./pdf/pdf-content";
 import { generateQrDataUrl } from "@/lib/pdf/qr";
+import { loadImageAsDataUrl } from "@/lib/pdf/load-image";
 import type { Proposal } from "@/lib/types";
 
 function waitForImages(container: HTMLElement): Promise<void> {
@@ -88,6 +89,28 @@ export function DownloadOfferButton({ proposal, className }: { proposal: Proposa
         pdf.addImage(imgData, "JPEG", 0, cursorY, imgWidth, imgHeight);
         cursorY += imgHeight;
         pageHasContent = true;
+      }
+
+      // Logo en la esquina inferior derecha de cada página.
+      const logoUrl = proposal.content.header.logoUrl;
+      if (logoUrl) {
+        const logo = await loadImageAsDataUrl(logoUrl);
+        if (logo) {
+          const margin = 24;
+          const maxW = 60;
+          const maxH = 26;
+          let logoW = maxW;
+          let logoH = (logo.height / logo.width) * logoW;
+          if (logoH > maxH) {
+            logoH = maxH;
+            logoW = (logo.width / logo.height) * logoH;
+          }
+          const totalPages = pdf.getNumberOfPages();
+          for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            pdf.addImage(logo.dataUrl, "PNG", pageWidth - margin - logoW, pageHeight - margin - logoH, logoW, logoH);
+          }
+        }
       }
 
       pdf.save(`Propuesta-${proposal.numero}.pdf`);
