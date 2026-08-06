@@ -206,13 +206,14 @@ export function PdfProposalContent({ proposal, qrDataUrl }: { proposal: Proposal
         <PdfSection title="Inversión">
           <div style={{ textAlign: "center", border: "1px solid #e6c675", borderRadius: 12, padding: 20 }}>
             {hasPromo && (
-              <div style={{ position: "relative", display: "inline-block" }}>
-                <p style={{ fontSize: 13, color: "#98989d", margin: 0 }}>
+              <div style={{ position: "relative", display: "inline-block", height: 18, lineHeight: "18px" }}>
+                <p style={{ fontSize: 13, lineHeight: "18px", color: "#98989d", margin: 0 }}>
                   {formatCurrency(proposal.precio_normal, proposal.moneda)}
                 </p>
                 {/* text-decoration: line-through no se posiciona bien al capturarse con html2canvas,
-                    así que dibujamos la línea nosotros mismos, centrada verticalmente sobre el texto. */}
-                <div style={{ position: "absolute", left: 0, right: 0, top: "50%", height: 1, background: "#98989d" }} />
+                    así que dibujamos la línea nosotros mismos. Usamos un "top" en píxeles (mitad exacta
+                    de los 18px de alto) en vez de "50%": los porcentajes tampoco se calculan bien acá. */}
+                <div style={{ position: "absolute", left: 0, right: 0, top: 9, height: 1, background: "#98989d" }} />
               </div>
             )}
             <p style={{ fontSize: 28, fontWeight: 700, margin: "4px 0" }}>{formatCurrency(precio, proposal.moneda)}</p>
