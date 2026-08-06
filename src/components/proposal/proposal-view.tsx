@@ -15,6 +15,7 @@ import {
 import { PriceSection } from "./price-section";
 import { AcceptFlow } from "./accept-flow";
 import { ViewTracker } from "./view-tracker";
+import { DownloadOfferButton } from "./download-offer-button";
 import type { Proposal } from "@/lib/types";
 
 export function ProposalView({ proposal, live = false }: { proposal: Proposal; live?: boolean }) {
@@ -53,6 +54,9 @@ export function ProposalView({ proposal, live = false }: { proposal: Proposal; l
             El botón “Aceptar Cotización” estará activo cuando el cliente vea el enlace público.
           </div>
         )}
+        <div className="mt-4 flex justify-center">
+          <DownloadOfferButton proposal={proposal} />
+        </div>
       </section>
 
       <footer className="border-t border-border py-8 text-center text-xs text-muted">
