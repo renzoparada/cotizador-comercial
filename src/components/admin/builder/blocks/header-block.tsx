@@ -1,6 +1,7 @@
 "use client";
 
 import { Input, Label, Textarea } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "../image-upload";
 import type { HeaderBlock } from "@/lib/types";
 
@@ -65,6 +66,22 @@ export function HeaderBlockEditor({ value, onChange }: { value: HeaderBlock; onC
             />
           </div>
         </div>
+
+        {value.firmaUrl && (
+          <div className="mt-3 flex items-center justify-between rounded-xl bg-surface-2 px-3.5 py-3">
+            <div>
+              <Label className="mb-0">Mi firma es de color claro</Label>
+              <p className="text-xs text-muted">
+                El PDF descargable siempre tiene fondo blanco. Actívalo si tu firma es blanca/clara (como en el modo
+                oscuro de la web) para que se invierta a oscuro solo en el PDF y no se pierda.
+              </p>
+            </div>
+            <Switch
+              checked={value.firmaInvertirEnPdf}
+              onCheckedChange={(firmaInvertirEnPdf) => onChange({ ...value, firmaInvertirEnPdf })}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

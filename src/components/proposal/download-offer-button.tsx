@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PdfProposalContent } from "./pdf/pdf-content";
 import { generateQrDataUrl } from "@/lib/pdf/qr";
 import { loadImageAsDataUrl } from "@/lib/pdf/load-image";
+import { invertImageColors } from "@/lib/pdf/invert-image";
 import type { Proposal } from "@/lib/types";
 
 function waitForImages(container: HTMLElement): Promise<void> {
@@ -26,13 +27,25 @@ function waitForImages(container: HTMLElement): Promise<void> {
 export function DownloadOfferButton({ proposal, className }: { proposal: Proposal; className?: string }) {
   const hiddenRef = useRef<HTMLDivElement>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [firmaDataUrl, setFirmaDataUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const { firmaUrl, firmaInvertirEnPdf } = proposal.content.header;
 
   useEffect(() => {
     if (proposal.content.video.enabled && proposal.content.video.url) {
       generateQrDataUrl(proposal.content.video.url).then(setQrDataUrl);
     }
   }, [proposal.content.video.enabled, proposal.content.video.url]);
+
+  useEffect(() => {
+    if (firmaUrl && firmaInvertirEnPdf) {
+      invertImageColors(firmaUrl).then(setFirmaDataUrl);
+    } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- resetea si se desactiva la inversión
+      setFirmaDataUrl(null);
+    }
+  }, [firmaUrl, firmaInvertirEnPdf]);
 
   async function handleDownload() {
     if (!hiddenRef.current) return;
@@ -134,7 +147,7 @@ export function DownloadOfferButton({ proposal, className }: { proposal: Proposa
         style={{ position: "fixed", top: 0, left: -10000, zIndex: -1, pointerEvents: "none" }}
       >
         <div ref={hiddenRef}>
-          <PdfProposalContent proposal={proposal} qrDataUrl={qrDataUrl} />
+          <PdfProposalContent proposal={proposal} qrDataUrl={qrDataUrl} firmaDataUrl={firmaDataUrl} />
         </div>
       </div>
     </>

@@ -7,9 +7,19 @@ import type { Proposal } from "@/lib/types";
  * como imagen y convertirse en PDF. El video se reemplaza por un QR ("Ver Video")
  * y no incluye el botón de aceptar — no tiene sentido en un documento descargado.
  */
-export function PdfProposalContent({ proposal, qrDataUrl }: { proposal: Proposal; qrDataUrl: string | null }) {
+export function PdfProposalContent({
+  proposal,
+  qrDataUrl,
+  firmaDataUrl,
+}: {
+  proposal: Proposal;
+  qrDataUrl: string | null;
+  /** Firma ya invertida a oscuro (data URL), cuando header.firmaInvertirEnPdf está activo. */
+  firmaDataUrl?: string | null;
+}) {
   const { content } = proposal;
   const { header } = content;
+  const firmaSrc = firmaDataUrl ?? header.firmaUrl;
   const precio = proposal.precio_promocional ?? proposal.precio_normal;
   const hasPromo =
     proposal.precio_promocional != null && proposal.precio_normal != null && proposal.precio_promocional < proposal.precio_normal;
@@ -219,9 +229,14 @@ export function PdfProposalContent({ proposal, qrDataUrl }: { proposal: Proposal
 
       {/* Firma */}
       <div style={{ padding: "40px 48px 56px", textAlign: "center", borderTop: "1px solid #e5e5ea" }}>
-        {header.firmaUrl && (
+        {firmaSrc && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={header.firmaUrl} alt="Firma" crossOrigin="anonymous" style={{ height: 56, margin: "0 auto 8px", display: "block" }} />
+          <img
+            src={firmaSrc}
+            alt="Firma"
+            crossOrigin="anonymous"
+            style={{ height: 56, margin: "0 auto 8px", display: "block" }}
+          />
         )}
         {header.firmaTexto && <p style={{ fontSize: 12.5, fontWeight: 600, margin: 0 }}>{header.firmaTexto}</p>}
         <p style={{ fontSize: 10.5, color: "#98989d", marginTop: 16 }}>Propuesta {proposal.numero}</p>

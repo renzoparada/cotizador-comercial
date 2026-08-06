@@ -66,6 +66,9 @@ export interface HeaderBlock {
   subtitle: string;
   firmaUrl: string | null;
   firmaTexto: string | null;
+  /** La web puede estar en modo oscuro (firma clara se ve bien) pero el PDF siempre
+   *  tiene fondo blanco. Si es true, la firma se invierte a oscura solo en el PDF. */
+  firmaInvertirEnPdf: boolean;
 }
 
 export interface VideoBlock {
@@ -151,6 +154,7 @@ export const EMPTY_PROPOSAL_CONTENT: ProposalContent = {
     subtitle: "",
     firmaUrl: null,
     firmaTexto: "",
+    firmaInvertirEnPdf: false,
   },
   video: { enabled: false, url: "" },
   description: { html: "" },
