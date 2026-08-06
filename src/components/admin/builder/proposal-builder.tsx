@@ -36,6 +36,7 @@ import { AgendaBlockEditor } from "./blocks/agenda-block";
 import { DurationBlockEditor } from "./blocks/duration-block";
 import { FacilitatorBlockEditor } from "./blocks/facilitator-block";
 import { TestimonialsBlockEditor } from "./blocks/testimonials-block";
+import { ClientLogosBlockEditor } from "./blocks/client-logos-block";
 import { GalleryBlockEditor } from "./blocks/gallery-block";
 import { PriceBlockEditor } from "./blocks/price-block";
 import { AvailabilityBlockEditor } from "./blocks/availability-block";
@@ -232,6 +233,10 @@ export function ProposalBuilder({
 
           <BuilderSection title="Testimonios" icon={Quote}>
             <TestimonialsBlockEditor value={content.testimonials} onChange={(testimonials) => setContent((c) => ({ ...c, testimonials }))} />
+          </BuilderSection>
+
+          <BuilderSection title="Empresas que confían en nosotros" icon={Building2}>
+            <ClientLogosBlockEditor value={content.clientLogos} onChange={(clientLogos) => setContent((c) => ({ ...c, clientLogos }))} />
           </BuilderSection>
 
           <BuilderSection title="Galería" icon={Images}>

@@ -129,6 +129,12 @@ export interface GalleryItem {
   caption?: string;
 }
 
+export interface ClientLogo {
+  id: string;
+  url: string;
+  nombre?: string;
+}
+
 export interface ProposalContent {
   header: HeaderBlock;
   video: VideoBlock;
@@ -142,6 +148,7 @@ export interface ProposalContent {
   bonus: ListItem[];
   facilitator: FacilitatorBlock;
   testimonials: Testimonial[];
+  clientLogos: ClientLogo[];
   gallery: GalleryItem[];
 }
 
@@ -167,6 +174,7 @@ export const EMPTY_PROPOSAL_CONTENT: ProposalContent = {
   bonus: [],
   facilitator: { photoUrl: null, bio: "", experiencia: "", certificaciones: [] },
   testimonials: [],
+  clientLogos: [],
   gallery: [],
 };
 

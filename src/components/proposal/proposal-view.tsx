@@ -10,6 +10,7 @@ import {
   BonusSection,
   FacilitatorSection,
   TestimonialsSection,
+  ClientLogosSection,
   GallerySection,
 } from "./sections";
 import { PriceSection } from "./price-section";
@@ -36,6 +37,7 @@ export function ProposalView({ proposal, live = false }: { proposal: Proposal; l
       <BonusSection bonus={content.bonus} />
       <FacilitatorSection facilitator={content.facilitator} trainerName={content.header.trainerName} />
       <TestimonialsSection testimonials={content.testimonials} />
+      <ClientLogosSection clientLogos={content.clientLogos} />
       <GallerySection gallery={content.gallery} />
       <PriceSection
         mostrarPrecio={proposal.mostrar_precio}

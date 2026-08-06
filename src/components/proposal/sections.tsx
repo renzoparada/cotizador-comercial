@@ -11,6 +11,7 @@ import {
   Quote,
   Images,
   PlayCircle,
+  Building2,
 } from "lucide-react";
 import { ProposalSection } from "./section";
 import { Reveal } from "./reveal";
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 import type {
   AgendaModule,
   BenefitItem,
+  ClientLogo,
   DescriptionBlock,
   DurationBlock,
   FacilitatorBlock,
@@ -278,6 +280,24 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
           </Reveal>
         ))}
       </div>
+    </ProposalSection>
+  );
+}
+
+export function ClientLogosSection({ clientLogos }: { clientLogos: ClientLogo[] }) {
+  if (clientLogos.length === 0) return null;
+  return (
+    <ProposalSection title="Empresas que confían en nosotros" icon={Building2} eyebrow="Clientes" className="bg-surface-2/50">
+      <Reveal>
+        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-10 gap-y-6">
+          {clientLogos.map((logo) => (
+            <div key={logo.id} className="flex h-12 items-center justify-center opacity-80 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logo.url} alt={logo.nombre || "Cliente"} className="max-h-12 max-w-[140px] object-contain" />
+            </div>
+          ))}
+        </div>
+      </Reveal>
     </ProposalSection>
   );
 }

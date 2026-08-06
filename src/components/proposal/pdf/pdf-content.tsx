@@ -181,6 +181,24 @@ export function PdfProposalContent({ proposal, qrDataUrl }: { proposal: Proposal
         </PdfSection>
       )}
 
+      {/* Empresas que confían en nosotros */}
+      {content.clientLogos.length > 0 && (
+        <PdfSection title="Empresas que confían en nosotros">
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 24 }}>
+            {content.clientLogos.map((logo) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={logo.id}
+                src={logo.url}
+                alt={logo.nombre || ""}
+                crossOrigin="anonymous"
+                style={{ maxHeight: 36, maxWidth: 110, objectFit: "contain" }}
+              />
+            ))}
+          </div>
+        </PdfSection>
+      )}
+
       {/* Galería (solo fotos — los videos ya están cubiertos por el QR de arriba) */}
       {content.gallery.some((g) => g.type === "photo") && (
         <PdfSection title="Galería">
