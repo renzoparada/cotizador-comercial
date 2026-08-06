@@ -7,19 +7,9 @@ import type { Proposal } from "@/lib/types";
  * como imagen y convertirse en PDF. El video se reemplaza por un QR ("Ver Video")
  * y no incluye el botón de aceptar — no tiene sentido en un documento descargado.
  */
-export function PdfProposalContent({
-  proposal,
-  qrDataUrl,
-  firmaDataUrl,
-}: {
-  proposal: Proposal;
-  qrDataUrl: string | null;
-  /** Firma ya invertida a oscuro (data URL), cuando header.firmaInvertirEnPdf está activo. */
-  firmaDataUrl?: string | null;
-}) {
+export function PdfProposalContent({ proposal, qrDataUrl }: { proposal: Proposal; qrDataUrl: string | null }) {
   const { content } = proposal;
   const { header } = content;
-  const firmaSrc = firmaDataUrl ?? header.firmaUrl;
   const precio = proposal.precio_promocional ?? proposal.precio_normal;
   const hasPromo =
     proposal.precio_promocional != null && proposal.precio_normal != null && proposal.precio_promocional < proposal.precio_normal;
@@ -216,9 +206,14 @@ export function PdfProposalContent({
         <PdfSection title="Inversión">
           <div style={{ textAlign: "center", border: "1px solid #e6c675", borderRadius: 12, padding: 20 }}>
             {hasPromo && (
-              <p style={{ fontSize: 13, color: "#98989d", textDecoration: "line-through", margin: 0 }}>
-                {formatCurrency(proposal.precio_normal, proposal.moneda)}
-              </p>
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <p style={{ fontSize: 13, color: "#98989d", margin: 0 }}>
+                  {formatCurrency(proposal.precio_normal, proposal.moneda)}
+                </p>
+                {/* text-decoration: line-through no se posiciona bien al capturarse con html2canvas,
+                    así que dibujamos la línea nosotros mismos, centrada verticalmente sobre el texto. */}
+                <div style={{ position: "absolute", left: 0, right: 0, top: "50%", height: 1, background: "#98989d" }} />
+              </div>
             )}
             <p style={{ fontSize: 28, fontWeight: 700, margin: "4px 0" }}>{formatCurrency(precio, proposal.moneda)}</p>
             {proposal.validez_oferta && <p style={{ fontSize: 12.5, color: "#b8860b", fontWeight: 600 }}>{proposal.validez_oferta}</p>}
@@ -229,10 +224,11 @@ export function PdfProposalContent({
 
       {/* Firma */}
       <div style={{ padding: "40px 48px 56px", textAlign: "center", borderTop: "1px solid #e5e5ea" }}>
-        {firmaSrc && (
+        {header.firmaUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={firmaSrc}
+            data-role="firma-img"
+            src={header.firmaUrl}
             alt="Firma"
             crossOrigin="anonymous"
             style={{ height: 56, margin: "0 auto 8px", display: "block" }}

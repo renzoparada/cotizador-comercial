@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { PdfProposalContent } from "./pdf/pdf-content";
 import { generateQrDataUrl } from "@/lib/pdf/qr";
 import { loadImageAsDataUrl } from "@/lib/pdf/load-image";
-import { invertImageColors } from "@/lib/pdf/invert-image";
 import type { Proposal } from "@/lib/types";
 
 function waitForImages(container: HTMLElement): Promise<void> {
@@ -27,25 +26,15 @@ function waitForImages(container: HTMLElement): Promise<void> {
 export function DownloadOfferButton({ proposal, className }: { proposal: Proposal; className?: string }) {
   const hiddenRef = useRef<HTMLDivElement>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [firmaDataUrl, setFirmaDataUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { firmaUrl, firmaInvertirEnPdf } = proposal.content.header;
+  const { firmaInvertirEnPdf } = proposal.content.header;
 
   useEffect(() => {
     if (proposal.content.video.enabled && proposal.content.video.url) {
       generateQrDataUrl(proposal.content.video.url).then(setQrDataUrl);
     }
   }, [proposal.content.video.enabled, proposal.content.video.url]);
-
-  useEffect(() => {
-    if (firmaUrl && firmaInvertirEnPdf) {
-      invertImageColors(firmaUrl).then(setFirmaDataUrl);
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- resetea si se desactiva la inversión
-      setFirmaDataUrl(null);
-    }
-  }, [firmaUrl, firmaInvertirEnPdf]);
 
   async function handleDownload() {
     if (!hiddenRef.current) return;
@@ -54,6 +43,34 @@ export function DownloadOfferButton({ proposal, className }: { proposal: Proposa
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")]);
 
       await waitForImages(hiddenRef.current);
+
+      // Si la firma es de color claro, la invertimos a oscuro justo antes de capturar,
+      // reutilizando html2canvas (el mismo mecanismo que ya carga bien el resto de las
+      // imágenes) en vez de leer los píxeles de la imagen original directamente, que
+      // puede fallar por CORS con imágenes de otro origen (ej. Supabase Storage).
+      if (firmaInvertirEnPdf) {
+        const firmaImg = hiddenRef.current.querySelector('img[data-role="firma-img"]') as HTMLImageElement | null;
+        if (firmaImg) {
+          const firmaCanvas = await html2canvas(firmaImg, { scale: 2, useCORS: true, backgroundColor: null });
+          const ctx = firmaCanvas.getContext("2d");
+          if (ctx) {
+            const imageData = ctx.getImageData(0, 0, firmaCanvas.width, firmaCanvas.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = 255 - data[i];
+              data[i + 1] = 255 - data[i + 1];
+              data[i + 2] = 255 - data[i + 2];
+            }
+            ctx.putImageData(imageData, 0, 0);
+            const invertedDataUrl = firmaCanvas.toDataURL("image/png");
+            await new Promise<void>((resolve) => {
+              firmaImg.addEventListener("load", () => resolve(), { once: true });
+              firmaImg.addEventListener("error", () => resolve(), { once: true });
+              firmaImg.src = invertedDataUrl;
+            });
+          }
+        }
+      }
 
       // Cada bloque (encabezado, cada sección, firma) es un hijo directo del contenedor
       // raíz. Los capturamos por separado y los vamos acomodando en páginas, de forma
@@ -147,7 +164,7 @@ export function DownloadOfferButton({ proposal, className }: { proposal: Proposa
         style={{ position: "fixed", top: 0, left: -10000, zIndex: -1, pointerEvents: "none" }}
       >
         <div ref={hiddenRef}>
-          <PdfProposalContent proposal={proposal} qrDataUrl={qrDataUrl} firmaDataUrl={firmaDataUrl} />
+          <PdfProposalContent proposal={proposal} qrDataUrl={qrDataUrl} />
         </div>
       </div>
     </>
