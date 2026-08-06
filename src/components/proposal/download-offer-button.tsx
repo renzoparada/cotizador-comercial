@@ -41,30 +41,53 @@ export function DownloadOfferButton({ proposal, className }: { proposal: Proposa
 
       await waitForImages(hiddenRef.current);
 
-      const canvas = await html2canvas(hiddenRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        windowWidth: hiddenRef.current.scrollWidth,
-      });
+      // Cada bloque (encabezado, cada sección, firma) es un hijo directo del contenedor
+      // raíz. Los capturamos por separado y los vamos acomodando en páginas, de forma
+      // que ninguna sección quede cortada a la mitad entre una página y la siguiente.
+      const root = hiddenRef.current.firstElementChild as HTMLElement | null;
+      const blocks = root ? (Array.from(root.children) as HTMLElement[]) : [];
 
       const pdf = new jsPDF("p", "pt", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const imgData = canvas.toDataURL("image/jpeg", 0.92);
 
-      let heightLeft = imgHeight;
-      let position = 0;
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      let cursorY = 0;
+      let pageHasContent = false;
 
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      for (const block of blocks) {
+        const canvas = await html2canvas(block, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const imgData = canvas.toDataURL("image/jpeg", 0.92);
+
+        if (imgHeight > pageHeight) {
+          // Bloque más alto que una página completa (ej. una galería larga): lo partimos.
+          if (pageHasContent) {
+            pdf.addPage();
+          }
+          let heightLeft = imgHeight;
+          let position = 0;
+          pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+          while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+          cursorY = 0;
+          pageHasContent = false; // el próximo bloque empieza en página nueva
+          continue;
+        }
+
+        if (pageHasContent && cursorY + imgHeight > pageHeight) {
+          pdf.addPage();
+          cursorY = 0;
+        }
+
+        pdf.addImage(imgData, "JPEG", 0, cursorY, imgWidth, imgHeight);
+        cursorY += imgHeight;
+        pageHasContent = true;
       }
 
       pdf.save(`Propuesta-${proposal.numero}.pdf`);
