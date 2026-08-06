@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getProposalBySlug } from "@/lib/queries/proposals";
 import { ProposalView } from "@/components/proposal/proposal-view";
-import type { Proposal } from "@/lib/types";
+import { ExpiredScreen } from "@/components/proposal/expired-screen";
+import { isProposalExpired } from "@/lib/proposal-status";
 
 export const dynamic = "force-dynamic";
 
@@ -34,12 +35,9 @@ export default async function PublicProposalPage({ params }: { params: Promise<{
   const proposal = await loadProposal(slug);
   if (!proposal) notFound();
 
-  const isExpired =
-    proposal.vencimiento &&
-    new Date(proposal.vencimiento) < new Date() &&
-    (proposal.estado === "enviada" || proposal.estado === "vista");
+  if (isProposalExpired(proposal)) {
+    return <ExpiredScreen header={proposal.content.header} />;
+  }
 
-  const displayProposal: Proposal = isExpired ? { ...proposal, estado: "vencida" } : proposal;
-
-  return <ProposalView proposal={displayProposal} live />;
+  return <ProposalView proposal={proposal} live />;
 }

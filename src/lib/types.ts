@@ -64,6 +64,8 @@ export interface HeaderBlock {
   trainerPhotoUrl: string | null;
   title: string;
   subtitle: string;
+  firmaUrl: string | null;
+  firmaTexto: string | null;
 }
 
 export interface VideoBlock {
@@ -147,6 +149,8 @@ export const EMPTY_PROPOSAL_CONTENT: ProposalContent = {
     trainerPhotoUrl: null,
     title: "Nueva propuesta comercial",
     subtitle: "",
+    firmaUrl: null,
+    firmaTexto: "",
   },
   video: { enabled: false, url: "" },
   description: { html: "" },
@@ -185,6 +189,7 @@ export interface Proposal {
   accepted_at: string | null;
   rejected_at: string | null;
   vencimiento: string | null;
+  habilitada: boolean;
   created_at: string;
   updated_at: string;
 }

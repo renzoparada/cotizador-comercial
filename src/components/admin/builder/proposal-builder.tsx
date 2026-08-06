@@ -19,6 +19,7 @@ import {
   Images,
   Tag,
   Building2,
+  CalendarClock,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -37,10 +38,13 @@ import { FacilitatorBlockEditor } from "./blocks/facilitator-block";
 import { TestimonialsBlockEditor } from "./blocks/testimonials-block";
 import { GalleryBlockEditor } from "./blocks/gallery-block";
 import { PriceBlockEditor } from "./blocks/price-block";
+import { AvailabilityBlockEditor } from "./blocks/availability-block";
 import { ProposalView } from "@/components/proposal/proposal-view";
+import { ExpiredScreen } from "@/components/proposal/expired-screen";
 import { AiAssistButton } from "@/components/admin/ai/ai-assist-button";
 import { RewriteToneButtons } from "@/components/admin/ai/rewrite-tone-buttons";
 import { createClient } from "@/lib/supabase/client";
+import { isProposalExpired } from "@/lib/proposal-status";
 import type { ProposalContent, ProposalEvent, ProposalStatus, ProposalView as ProposalViewType, ProposalWithClient } from "@/lib/types";
 
 export function ProposalBuilder({
@@ -60,6 +64,10 @@ export function ProposalBuilder({
     moneda: proposal.moneda,
     validez_oferta: proposal.validez_oferta,
     notas_precio: proposal.notas_precio,
+  });
+  const [availability, setAvailability] = useState({
+    habilitada: proposal.habilitada,
+    vencimiento: proposal.vencimiento ? proposal.vencimiento.slice(0, 10) : null,
   });
   const [estado, setEstado] = useState<ProposalStatus>(proposal.estado);
   const [saveState, setSaveState] = useState<"saved" | "saving" | "idle">("idle");
@@ -82,6 +90,7 @@ export function ProposalBuilder({
           content,
           titulo: content.header.title || "Propuesta comercial",
           ...pricing,
+          ...availability,
         })
         .eq("id", proposal.id);
       setSaveState(error ? "idle" : "saved");
@@ -91,9 +100,10 @@ export function ProposalBuilder({
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, pricing]);
+  }, [content, pricing, availability]);
 
-  const previewProposal = { ...proposal, content, ...pricing, estado };
+  const previewProposal = { ...proposal, content, ...pricing, ...availability, estado };
+  const previewExpired = isProposalExpired({ habilitada: availability.habilitada, vencimiento: availability.vencimiento, estado });
 
   return (
     <div>
@@ -241,11 +251,23 @@ export function ProposalBuilder({
             </div>
             <PriceBlockEditor value={pricing} onChange={setPricing} />
           </BuilderSection>
+
+          <BuilderSection
+            title="Disponibilidad"
+            icon={CalendarClock}
+            badge={!availability.habilitada ? <span className="text-xs font-medium text-warning">Deshabilitada</span> : undefined}
+          >
+            <AvailabilityBlockEditor value={availability} onChange={setAvailability} />
+          </BuilderSection>
         </TabsContent>
 
         <TabsContent value="preview" className="mt-5">
           <div className="overflow-hidden rounded-2xl border border-border">
-            <ProposalView proposal={previewProposal} live={false} />
+            {previewExpired ? (
+              <ExpiredScreen header={content.header} />
+            ) : (
+              <ProposalView proposal={previewProposal} live={false} />
+            )}
           </div>
         </TabsContent>
 

@@ -43,6 +43,29 @@ export function HeaderBlockEditor({ value, onChange }: { value: HeaderBlock; onC
           placeholder="Una frase que resuma el valor de la propuesta"
         />
       </div>
+
+      <div className="border-t border-border pt-4">
+        <p className="mb-1 text-sm font-medium">Firma</p>
+        <p className="mb-3 text-xs text-muted">
+          Se usa al final de la propuesta y en la pantalla de &ldquo;cotización vencida&rdquo; cuando la deshabilites.
+        </p>
+        <div className="flex gap-4">
+          <ImageUpload
+            label="Imagen de firma (opcional)"
+            value={value.firmaUrl}
+            onChange={(firmaUrl) => onChange({ ...value, firmaUrl })}
+          />
+          <div className="flex-1">
+            <Label htmlFor="firmaTexto">Texto de la firma</Label>
+            <Input
+              id="firmaTexto"
+              value={value.firmaTexto ?? ""}
+              onChange={(e) => onChange({ ...value, firmaTexto: e.target.value })}
+              placeholder="Ej. Renzo Parada — Director"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
