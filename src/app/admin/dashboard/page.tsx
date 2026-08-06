@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/admin/page-header";
 import { StatCard } from "@/components/admin/dashboard/stat-card";
 import { MonthlyChart } from "@/components/admin/dashboard/monthly-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { formatMoneyByCurrency } from "@/lib/utils";
 import {
   FileText,
   CheckCircle2,
@@ -34,8 +34,8 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="Monto cotizado" value={formatCurrency(data.montoCotizado)} icon={DollarSign} tone="primary" />
-        <StatCard label="Monto aceptado" value={formatCurrency(data.montoAceptado)} icon={DollarSign} tone="success" />
+        <StatCard label="Monto cotizado" value={formatMoneyByCurrency(data.montoCotizado)} icon={DollarSign} tone="primary" />
+        <StatCard label="Monto aceptado" value={formatMoneyByCurrency(data.montoAceptado)} icon={DollarSign} tone="success" />
         <StatCard label="Conversión" value={`${data.conversion.toFixed(1)}%`} icon={TrendingUp} tone="gold" hint="Aceptadas sobre enviadas" />
       </div>
 
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
                   <p className="truncate text-sm font-medium">{c.empresa}</p>
                   <p className="text-xs text-muted">{c.count} cotización(es)</p>
                 </div>
-                <p className="text-sm font-semibold">{formatCurrency(c.monto)}</p>
+                <p className="text-sm font-semibold">{formatMoneyByCurrency(c.montos)}</p>
               </div>
             ))}
             {data.topClients.length === 0 && (

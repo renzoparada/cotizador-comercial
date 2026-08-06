@@ -24,7 +24,7 @@ import { StatusBadge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ClientFormModal } from "./client-form-modal";
 import { createClient } from "@/lib/supabase/client";
-import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
+import { formatCurrency, formatDate, formatDateTime, formatMoneyByCurrency } from "@/lib/utils";
 import type { Client, ClientNote, Proposal } from "@/lib/types";
 
 export function ClientDetail({
@@ -85,9 +85,17 @@ export function ClientDetail({
     router.refresh();
   }
 
-  const totalMonto = proposals.reduce(
-    (sum, p) => sum + (p.precio_promocional ?? p.precio_normal ?? 0),
-    0,
+  const totalMonto = formatMoneyByCurrency(
+    Array.from(
+      proposals
+        .reduce((map, p) => {
+          const amount = p.precio_promocional ?? p.precio_normal ?? 0;
+          if (!amount) return map;
+          map.set(p.moneda, (map.get(p.moneda) ?? 0) + amount);
+          return map;
+        }, new Map<string, number>())
+        .entries(),
+    ).map(([currency, amount]) => ({ currency, amount })),
   );
 
   return (
@@ -148,7 +156,7 @@ export function ClientDetail({
               </div>
               <div>
                 <p className="text-muted text-xs">Monto total</p>
-                <p className="font-semibold">{formatCurrency(totalMonto)}</p>
+                <p className="font-semibold">{totalMonto}</p>
               </div>
               <div>
                 <p className="text-muted text-xs">Cliente desde</p>
@@ -207,7 +215,7 @@ export function ClientDetail({
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <span className="text-sm font-medium">
-                          {formatCurrency(p.precio_promocional ?? p.precio_normal)}
+                          {formatCurrency(p.precio_promocional ?? p.precio_normal, p.moneda)}
                         </span>
                         <StatusBadge status={p.estado} />
                       </div>

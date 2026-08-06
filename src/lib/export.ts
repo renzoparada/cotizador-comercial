@@ -59,7 +59,22 @@ export function exportToPdf(proposals: ProposalWithClient[], filename = "cotizac
   autoTable(doc, {
     startY: 28,
     head: [Object.keys(rows[0] ?? {})],
-    body: rows.map((r) => Object.values(r).map((v) => (typeof v === "number" ? formatCurrency(v) : String(v)))),
+    // El monto se formatea con la moneda de cada fila (no una sola moneda fija),
+    // ya que distintas cotizaciones pueden estar en monedas distintas.
+    body: rows.map((r) => [
+      r.Número,
+      r.Título,
+      r.Empresa,
+      r.Contacto,
+      r.Correo,
+      r.Celular,
+      r.Ciudad,
+      r.Estado,
+      formatCurrency(r.Monto, r.Moneda),
+      r.Moneda,
+      r.Fecha,
+      String(r.Vistas),
+    ]),
     styles: { fontSize: 8 },
     headStyles: { fillColor: [59, 91, 253] },
   });

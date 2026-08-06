@@ -8,7 +8,7 @@ import { ExportButtons } from "@/components/admin/proposals/export-buttons";
 import { ProposalsFilterBar } from "@/components/admin/proposals/filter-bar";
 import { ProposalsTable } from "@/components/admin/proposals/proposals-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { formatMoneyByCurrency } from "@/lib/utils";
 import { FileText, DollarSign, TrendingUp } from "lucide-react";
 import type { ProposalStatus } from "@/lib/types";
 
@@ -39,7 +39,7 @@ export default async function ReportesPage({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard label="Cotizaciones totales" value={String(dashboard.total)} icon={FileText} tone="primary" />
-        <StatCard label="Monto cotizado" value={formatCurrency(dashboard.montoCotizado)} icon={DollarSign} tone="primary" />
+        <StatCard label="Monto cotizado" value={formatMoneyByCurrency(dashboard.montoCotizado)} icon={DollarSign} tone="primary" />
         <StatCard label="Conversión" value={`${dashboard.conversion.toFixed(1)}%`} icon={TrendingUp} tone="gold" />
       </div>
 

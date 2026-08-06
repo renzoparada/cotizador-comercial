@@ -7,10 +7,14 @@ interface RawProposal {
   precio_normal: number | null;
   precio_promocional: number | null;
   mostrar_precio: boolean;
+  moneda: string;
   created_at: string;
   client_id: string | null;
   client: { empresa: string } | { empresa: string }[] | null;
 }
+
+/** Monto agrupado por moneda — evita sumar montos de distintas monedas como si fueran una sola. */
+export type MoneyByCurrency = { currency: string; amount: number }[];
 
 export interface DashboardData {
   total: number;
@@ -18,22 +22,35 @@ export interface DashboardData {
   rechazadas: number;
   pendientes: number; // enviada + vista
   borradores: number;
-  montoCotizado: number;
-  montoAceptado: number;
+  montoCotizado: MoneyByCurrency;
+  montoAceptado: MoneyByCurrency;
   conversion: number;
   monthly: { month: string; total: number; aceptadas: number }[];
-  topClients: { empresa: string; monto: number; count: number }[];
+  topClients: { empresa: string; montos: MoneyByCurrency; count: number }[];
 }
 
 function montoDe(p: Pick<RawProposal, "precio_normal" | "precio_promocional">) {
   return p.precio_promocional ?? p.precio_normal ?? 0;
 }
 
+/** Suma montos agrupándolos por moneda, en vez de mezclar distintas monedas en un solo total. */
+function sumByCurrency(proposals: RawProposal[]): MoneyByCurrency {
+  const totals = new Map<string, number>();
+  for (const p of proposals) {
+    const amount = montoDe(p);
+    if (!amount) continue;
+    totals.set(p.moneda, (totals.get(p.moneda) ?? 0) + amount);
+  }
+  return Array.from(totals.entries())
+    .map(([currency, amount]) => ({ currency, amount }))
+    .sort((a, b) => b.amount - a.amount);
+}
+
 export async function getDashboardData(supabase: SupabaseClient): Promise<DashboardData> {
   const { data, error } = await supabase
     .from("proposals")
     .select(
-      "id, estado, precio_normal, precio_promocional, mostrar_precio, created_at, client_id, client:clients(empresa)",
+      "id, estado, precio_normal, precio_promocional, mostrar_precio, moneda, created_at, client_id, client:clients(empresa)",
     )
     .order("created_at", { ascending: true });
 
@@ -47,10 +64,8 @@ export async function getDashboardData(supabase: SupabaseClient): Promise<Dashbo
   const borradores = proposals.filter((p) => p.estado === "borrador").length;
 
   const enviadas = proposals.filter((p) => p.estado !== "borrador");
-  const montoCotizado = enviadas.reduce((sum, p) => sum + montoDe(p), 0);
-  const montoAceptado = proposals
-    .filter((p) => p.estado === "aceptada")
-    .reduce((sum, p) => sum + montoDe(p), 0);
+  const montoCotizado = sumByCurrency(enviadas);
+  const montoAceptado = sumByCurrency(proposals.filter((p) => p.estado === "aceptada"));
   const conversion = enviadas.length > 0 ? (aceptadas / enviadas.length) * 100 : 0;
 
   // Últimos 6 meses
@@ -76,18 +91,18 @@ export async function getDashboardData(supabase: SupabaseClient): Promise<Dashbo
     };
   });
 
-  const clientMap = new Map<string, { monto: number; count: number }>();
+  const clientMap = new Map<string, { proposals: RawProposal[]; count: number }>();
   for (const p of proposals) {
     const rel = Array.isArray(p.client) ? p.client[0] : p.client;
     const empresa = rel?.empresa ?? "Sin empresa";
-    const cur = clientMap.get(empresa) ?? { monto: 0, count: 0 };
-    cur.monto += montoDe(p);
+    const cur = clientMap.get(empresa) ?? { proposals: [], count: 0 };
+    cur.proposals.push(p);
     cur.count += 1;
     clientMap.set(empresa, cur);
   }
   const topClients = Array.from(clientMap.entries())
-    .map(([empresa, v]) => ({ empresa, ...v }))
-    .sort((a, b) => b.monto - a.monto)
+    .map(([empresa, v]) => ({ empresa, count: v.count, montos: sumByCurrency(v.proposals) }))
+    .sort((a, b) => (b.montos[0]?.amount ?? 0) - (a.montos[0]?.amount ?? 0))
     .slice(0, 5);
 
   return { total, aceptadas, rechazadas, pendientes, borradores, montoCotizado, montoAceptado, conversion, monthly, topClients };

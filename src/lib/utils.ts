@@ -32,6 +32,12 @@ export function formatCurrency(value: number | null | undefined, currency = "USD
   }
 }
 
+/** Formatea una lista de {currency, amount} — ej. de getDashboardData — como "US$1.200 · Bs5.000". */
+export function formatMoneyByCurrency(list: { currency: string; amount: number }[]): string {
+  if (list.length === 0) return "—";
+  return list.map(({ currency, amount }) => formatCurrency(amount, currency)).join(" · ");
+}
+
 export function formatDate(date: string | Date | null | undefined, opts?: Intl.DateTimeFormatOptions) {
   if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;
