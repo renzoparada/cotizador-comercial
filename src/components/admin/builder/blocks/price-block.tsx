@@ -3,6 +3,17 @@
 import { Input, Label, Select, Textarea } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 
+const CURRENCIES = [
+  { code: "USD", label: "USD — Dólar" },
+  { code: "BOB", label: "BOB — Bs (Boliviano)" },
+  { code: "COP", label: "COP — Peso colombiano" },
+  { code: "MXN", label: "MXN — Peso mexicano" },
+  { code: "PEN", label: "PEN — Sol peruano" },
+  { code: "CLP", label: "CLP — Peso chileno" },
+  { code: "ARS", label: "ARS — Peso argentino" },
+  { code: "EUR", label: "EUR — Euro" },
+];
+
 export interface PriceData {
   mostrar_precio: boolean;
   precio_normal: number | null;
@@ -45,9 +56,9 @@ export function PriceBlockEditor({ value, onChange }: { value: PriceData; onChan
         <div>
           <Label>Moneda</Label>
           <Select value={value.moneda} onChange={(e) => onChange({ ...value, moneda: e.target.value })}>
-            {["USD", "COP", "MXN", "PEN", "CLP", "ARS", "EUR"].map((c) => (
-              <option key={c} value={c}>
-                {c}
+            {CURRENCIES.map(({ code, label }) => (
+              <option key={code} value={code}>
+                {label}
               </option>
             ))}
           </Select>

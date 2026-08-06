@@ -5,16 +5,30 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Locale usado para formatear cada moneda — determina el símbolo mostrado
+// (ej. BOB necesita el locale de Bolivia para mostrar "Bs" en vez de "BOB").
+const CURRENCY_LOCALE: Record<string, string> = {
+  BOB: "es-BO",
+  COP: "es-CO",
+  MXN: "es-MX",
+  PEN: "es-PE",
+  CLP: "es-CL",
+  ARS: "es-AR",
+  EUR: "es-ES",
+  USD: "es-CO",
+};
+
 export function formatCurrency(value: number | null | undefined, currency = "USD") {
   if (value === null || value === undefined) return "—";
+  const locale = CURRENCY_LOCALE[currency] ?? "es-CO";
   try {
-    return new Intl.NumberFormat("es-CO", {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
       maximumFractionDigits: 0,
     }).format(value);
   } catch {
-    return `${currency} ${value.toLocaleString("es-CO")}`;
+    return `${currency} ${value.toLocaleString(locale)}`;
   }
 }
 
