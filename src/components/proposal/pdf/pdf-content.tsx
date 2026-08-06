@@ -1,5 +1,6 @@
 import { getBenefitIcon } from "@/lib/benefit-icons";
 import { formatCurrency } from "@/lib/utils";
+import { normalizeProposalContent } from "@/lib/types";
 import type { Proposal } from "@/lib/types";
 
 /**
@@ -8,7 +9,7 @@ import type { Proposal } from "@/lib/types";
  * y no incluye el botón de aceptar — no tiene sentido en un documento descargado.
  */
 export function PdfProposalContent({ proposal, qrDataUrl }: { proposal: Proposal; qrDataUrl: string | null }) {
-  const { content } = proposal;
+  const content = normalizeProposalContent(proposal.content);
   const { header } = content;
   const precio = proposal.precio_promocional ?? proposal.precio_normal;
   const hasPromo =

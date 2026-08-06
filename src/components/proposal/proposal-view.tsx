@@ -17,10 +17,11 @@ import { PriceSection } from "./price-section";
 import { AcceptFlow } from "./accept-flow";
 import { ViewTracker } from "./view-tracker";
 import { DownloadOfferButton } from "./download-offer-button";
+import { normalizeProposalContent } from "@/lib/types";
 import type { Proposal } from "@/lib/types";
 
 export function ProposalView({ proposal, live = false }: { proposal: Proposal; live?: boolean }) {
-  const { content } = proposal;
+  const content = normalizeProposalContent(proposal.content);
 
   return (
     <div className="min-h-screen bg-background">

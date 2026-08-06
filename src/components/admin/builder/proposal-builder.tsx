@@ -46,6 +46,7 @@ import { AiAssistButton } from "@/components/admin/ai/ai-assist-button";
 import { RewriteToneButtons } from "@/components/admin/ai/rewrite-tone-buttons";
 import { createClient } from "@/lib/supabase/client";
 import { isProposalExpired } from "@/lib/proposal-status";
+import { normalizeProposalContent } from "@/lib/types";
 import type { ProposalContent, ProposalEvent, ProposalStatus, ProposalView as ProposalViewType, ProposalWithClient } from "@/lib/types";
 
 export function ProposalBuilder({
@@ -57,7 +58,7 @@ export function ProposalBuilder({
   views: ProposalViewType[];
   events: ProposalEvent[];
 }) {
-  const [content, setContent] = useState<ProposalContent>(proposal.content);
+  const [content, setContent] = useState<ProposalContent>(normalizeProposalContent(proposal.content));
   const [pricing, setPricing] = useState({
     mostrar_precio: proposal.mostrar_precio,
     precio_normal: proposal.precio_normal,

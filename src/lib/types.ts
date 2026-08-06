@@ -178,6 +178,16 @@ export const EMPTY_PROPOSAL_CONTENT: ProposalContent = {
   gallery: [],
 };
 
+/**
+ * Las cotizaciones guardadas antes de agregar un campo nuevo a ProposalContent no
+ * lo tienen en su JSON en la base de datos (ej. clientLogos). Esta función rellena
+ * cualquier campo de nivel superior que falte con su valor por defecto, para que
+ * los componentes nunca reciban `undefined` donde esperan un arreglo/objeto.
+ */
+export function normalizeProposalContent(content: Partial<ProposalContent> | null | undefined): ProposalContent {
+  return { ...EMPTY_PROPOSAL_CONTENT, ...content };
+}
+
 export interface Proposal {
   id: string;
   numero: string;
