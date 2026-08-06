@@ -51,7 +51,10 @@ export function ProposalToolbar({
       return;
     }
     onStatusChange("enviada");
-    toast.success("Cotización marcada como enviada.");
+    navigator.clipboard.writeText(publicUrl).catch(() => {});
+    toast.success("Cotización enviada. Copiamos el enlace — pégalo en WhatsApp, correo o donde prefieras para compartirlo con tu cliente.", {
+      duration: 6000,
+    });
     router.refresh();
   }
 
