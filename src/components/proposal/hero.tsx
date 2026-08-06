@@ -19,7 +19,7 @@ export function ProposalHero({ header }: { header: HeaderBlock }) {
             transition={{ duration: 0.6 }}
             src={header.logoUrl}
             alt="Logo"
-            className="mx-auto mb-8 h-12 object-contain"
+            className="mx-auto mb-8 h-20 object-contain sm:h-24"
           />
         )}
 

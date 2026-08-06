@@ -6,7 +6,7 @@ export function ExpiredScreen({ header }: { header: HeaderBlock }) {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16 text-center">
       {header.logoUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={header.logoUrl} alt="Logo" className="mb-10 h-14 object-contain" />
+        <img src={header.logoUrl} alt="Logo" className="mb-10 h-20 object-contain sm:h-24" />
       )}
 
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-warning/10 text-warning">
