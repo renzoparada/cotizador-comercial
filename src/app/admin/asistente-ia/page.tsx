@@ -14,7 +14,7 @@ export default async function AsistenteIaPage() {
   const supabase = await createClient();
   const [clients, proposals] = await Promise.all([searchClients(supabase, ""), listProposals(supabase)]);
 
-  const aiConfigured = Boolean(process.env.ANTHROPIC_API_KEY);
+  const aiConfigured = Boolean(process.env.GEMINI_API_KEY);
 
   return (
     <div>
@@ -26,7 +26,7 @@ export default async function AsistenteIaPage() {
           <div>
             <p className="font-medium">Los extras de IA no están configurados</p>
             <p className="mt-0.5 text-warning/80">
-              Agrega la variable de entorno <code>ANTHROPIC_API_KEY</code> para habilitar la generación automática de contenido.
+              Agrega la variable de entorno <code>GEMINI_API_KEY</code> para habilitar la generación automática de contenido.
             </p>
           </div>
         </div>

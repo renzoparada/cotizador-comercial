@@ -1,65 +1,54 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-export function getAnthropicClient(): Anthropic | null {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return null;
-  return new Anthropic({ apiKey });
+export class AiNotConfiguredError extends Error {
+  constructor() {
+    super("Los extras de IA no están configurados. Agrega GEMINI_API_KEY en las variables de entorno.");
+    this.name = "AiNotConfiguredError";
+  }
 }
 
-/** Pide a Claude una respuesta en JSON puro y la parsea. Lanza si no hay API key configurada. */
-export async function generateJson<T>(system: string, prompt: string): Promise<T> {
-  const client = getAnthropicClient();
-  if (!client) {
-    throw new AiNotConfiguredError();
-  }
+function getGeminiClient(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+  return new GoogleGenAI({ apiKey });
+}
 
-  const message = await client.messages.create({
+/** Pide a Gemini una respuesta en JSON puro (modo JSON nativo) y la parsea. */
+export async function generateJson<T>(system: string, prompt: string): Promise<T> {
+  const client = getGeminiClient();
+  if (!client) throw new AiNotConfiguredError();
+
+  const response = await client.models.generateContent({
     model: MODEL,
-    max_tokens: 2000,
-    system: `${system}\n\nResponde ÚNICAMENTE con JSON válido, sin texto adicional, sin markdown ni bloques de código.`,
-    messages: [{ role: "user", content: prompt }],
+    contents: prompt,
+    config: {
+      systemInstruction: system,
+      responseMimeType: "application/json",
+    },
   });
 
-  const text = message.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
-
-  const cleaned = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```$/i, "");
+  const text = (response.text ?? "").trim();
 
   try {
-    return JSON.parse(cleaned) as T;
+    return JSON.parse(text) as T;
   } catch {
     throw new Error("La IA devolvió una respuesta con formato inesperado.");
   }
 }
 
 export async function generateText(system: string, prompt: string): Promise<string> {
-  const client = getAnthropicClient();
-  if (!client) {
-    throw new AiNotConfiguredError();
-  }
+  const client = getGeminiClient();
+  if (!client) throw new AiNotConfiguredError();
 
-  const message = await client.messages.create({
+  const response = await client.models.generateContent({
     model: MODEL,
-    max_tokens: 1500,
-    system,
-    messages: [{ role: "user", content: prompt }],
+    contents: prompt,
+    config: {
+      systemInstruction: system,
+    },
   });
 
-  return message.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
-}
-
-export class AiNotConfiguredError extends Error {
-  constructor() {
-    super("Los extras de IA no están configurados. Agrega ANTHROPIC_API_KEY en las variables de entorno.");
-    this.name = "AiNotConfiguredError";
-  }
+  return (response.text ?? "").trim();
 }

@@ -6,7 +6,7 @@ Plataforma SaaS para crear, enviar y dar seguimiento a propuestas comerciales de
 
 - **Frontend:** Next.js 16 (App Router), React 19, TailwindCSS 4, Framer Motion, TipTap (editor de texto enriquecido), Recharts.
 - **Backend:** Supabase (Postgres, Auth, Storage, Row Level Security).
-- **IA (opcional):** Anthropic Claude, para los "Extras inteligentes".
+- **IA (opcional):** Google Gemini (nivel gratuito, sin tarjeta), para los "Extras inteligentes".
 
 ## 1. Crear el proyecto de Supabase
 
@@ -30,7 +30,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key   # solo servidor, para invitar usuarios
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
-ANTHROPIC_API_KEY=                               # opcional, habilita los extras de IA
+GEMINI_API_KEY=                                  # opcional, habilita los extras de IA (gratis en aistudio.google.com/apikey)
 NOTIFY_WEBHOOK_URL=                              # opcional, webhook al aceptar una propuesta
 ```
 
@@ -51,7 +51,7 @@ Abre [http://localhost:3000](http://localhost:3000) — te llevará a `/login`.
 - **Clientes** — alta/edición, búsqueda, ficha con historial de cotizaciones, notas (CRM) y próximo seguimiento.
 - **Cotizaciones** — listado con filtros (empresa, contacto, correo, celular, ciudad, estado, fecha), export a CSV/Excel/PDF.
 - **Constructor de propuesta** — encabezado, video (YouTube/Vimeo), descripción (rich text), objetivos, beneficios (con íconos), temario por módulos, metodología, duración, incluye, **bonus**, perfil del facilitador, testimonios, galería y precio (con opción de ocultar el precio). Autoguardado y vista previa en vivo.
-- **Asistente IA** — generación de propuesta completa, reescritura de tono, objetivos y temario por IA, sugerencia de precio, carta de presentación personalizada, resumen ejecutivo y cross-selling (requiere `ANTHROPIC_API_KEY`).
+- **Asistente IA** — generación de propuesta completa, reescritura de tono, objetivos y temario por IA, sugerencia de precio, carta de presentación personalizada, resumen ejecutivo y cross-selling (requiere `GEMINI_API_KEY`, gratis en [Google AI Studio](https://aistudio.google.com/apikey)).
 - **Reportes** — tendencia mensual y exportación de cotizaciones filtradas.
 - **Configuración** — invitar usuarios y administrar roles (`admin`, `vendedor`, `instructor`). Solo administradores.
 
