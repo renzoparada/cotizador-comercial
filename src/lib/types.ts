@@ -150,6 +150,8 @@ export interface ProposalContent {
   testimonials: Testimonial[];
   clientLogos: ClientLogo[];
   gallery: GalleryItem[];
+  /** Si es false, el botón "Descargar oferta" (PDF) no se muestra en la landing pública. */
+  descargaHabilitada: boolean;
 }
 
 export const EMPTY_PROPOSAL_CONTENT: ProposalContent = {
@@ -176,6 +178,7 @@ export const EMPTY_PROPOSAL_CONTENT: ProposalContent = {
   testimonials: [],
   clientLogos: [],
   gallery: [],
+  descargaHabilitada: true,
 };
 
 /**

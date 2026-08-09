@@ -9,7 +9,17 @@ export interface AvailabilityData {
   vencimiento: string | null; // yyyy-mm-dd
 }
 
-export function AvailabilityBlockEditor({ value, onChange }: { value: AvailabilityData; onChange: (v: AvailabilityData) => void }) {
+export function AvailabilityBlockEditor({
+  value,
+  onChange,
+  descargaHabilitada,
+  onDescargaHabilitadaChange,
+}: {
+  value: AvailabilityData;
+  onChange: (v: AvailabilityData) => void;
+  descargaHabilitada: boolean;
+  onDescargaHabilitadaChange: (v: boolean) => void;
+}) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between rounded-xl bg-surface-2 px-3.5 py-3">
@@ -21,6 +31,16 @@ export function AvailabilityBlockEditor({ value, onChange }: { value: Availabili
           </p>
         </div>
         <Switch checked={value.habilitada} onCheckedChange={(habilitada) => onChange({ ...value, habilitada })} />
+      </div>
+
+      <div className="flex items-center justify-between rounded-xl bg-surface-2 px-3.5 py-3">
+        <div>
+          <Label className="mb-0">Permitir descargar la oferta (PDF)</Label>
+          <p className="text-xs text-muted">
+            Si lo desactivas, el botón &ldquo;Descargar oferta&rdquo; no aparece en el enlace público de esta cotización.
+          </p>
+        </div>
+        <Switch checked={descargaHabilitada} onCheckedChange={onDescargaHabilitadaChange} />
       </div>
 
       <div>

@@ -57,9 +57,11 @@ export function ProposalView({ proposal, live = false }: { proposal: Proposal; l
             El botón “Aceptar Cotización” estará activo cuando el cliente vea el enlace público.
           </div>
         )}
-        <div className="mt-4 flex justify-center">
-          <DownloadOfferButton proposal={proposal} />
-        </div>
+        {content.descargaHabilitada && (
+          <div className="mt-4 flex justify-center">
+            <DownloadOfferButton proposal={proposal} />
+          </div>
+        )}
       </section>
 
       <footer className="border-t border-border py-8 text-center text-xs text-muted">

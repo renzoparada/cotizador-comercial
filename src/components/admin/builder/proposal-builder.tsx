@@ -263,7 +263,12 @@ export function ProposalBuilder({
             icon={CalendarClock}
             badge={!availability.habilitada ? <span className="text-xs font-medium text-warning">Deshabilitada</span> : undefined}
           >
-            <AvailabilityBlockEditor value={availability} onChange={setAvailability} />
+            <AvailabilityBlockEditor
+              value={availability}
+              onChange={setAvailability}
+              descargaHabilitada={content.descargaHabilitada}
+              onDescargaHabilitadaChange={(descargaHabilitada) => setContent((c) => ({ ...c, descargaHabilitada }))}
+            />
           </BuilderSection>
         </TabsContent>
 
