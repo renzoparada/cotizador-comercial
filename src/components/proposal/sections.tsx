@@ -291,7 +291,7 @@ export function ClientLogosSection({ clientLogos }: { clientLogos: ClientLogo[] 
       <Reveal>
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-10 gap-y-6">
           {clientLogos.map((logo) => (
-            <div key={logo.id} className="flex h-12 items-center justify-center opacity-80 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0">
+            <div key={logo.id} className="flex h-12 items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={logo.url} alt={logo.nombre || "Cliente"} className="max-h-12 max-w-[140px] object-contain" />
             </div>
