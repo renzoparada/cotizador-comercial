@@ -10,6 +10,7 @@ import {
   BarChart3,
   Settings,
   Sparkles,
+  Radar,
   X,
 } from "lucide-react";
 import type { UserRole } from "@/lib/types";
@@ -20,6 +21,7 @@ const NAV = [
   { href: "/admin/clientes", label: "Clientes", icon: Users, roles: ["admin", "vendedor", "instructor"] },
   { href: "/admin/reportes", label: "Reportes", icon: BarChart3, roles: ["admin", "vendedor"] },
   { href: "/admin/asistente-ia", label: "Asistente IA", icon: Sparkles, roles: ["admin", "vendedor", "instructor"] },
+  { href: "/diagnostico", label: "Diagnóstico 360°", icon: Radar, roles: ["admin", "vendedor", "instructor"] },
   { href: "/admin/configuracion", label: "Configuración", icon: Settings, roles: ["admin"] },
 ] as const;
 

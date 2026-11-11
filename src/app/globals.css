@@ -151,3 +151,27 @@ body {
   pointer-events: none;
   height: 0;
 }
+
+/* Impresión de informes (Diagnóstico 360°) */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .card-shadow {
+    box-shadow: none !important;
+  }
+  .break-inside-avoid-page > div > * {
+    break-inside: avoid;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
