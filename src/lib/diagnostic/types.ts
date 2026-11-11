@@ -87,3 +87,35 @@ export interface DiagnosticResponse {
   createdAt: string;
   completedAt?: string;
 }
+
+/** Datos públicos de una campaña de diagnóstico (enlace compartido con un cliente). */
+export interface CampaignPublic {
+  slug: string;
+  titulo: string;
+  empresa: string;
+  abierta: boolean;
+}
+
+export interface DiagnosticCampaign {
+  id: string;
+  slug: string;
+  client_id: string;
+  owner_id: string | null;
+  titulo: string;
+  abierta: boolean;
+  notas: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiagnosticResponseRow {
+  id: string;
+  campaign_id: string;
+  info: RespondentInfo;
+  answers: Answers;
+  global_score: number | null;
+  dimension_scores: Record<string, number | null>;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}

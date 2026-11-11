@@ -26,15 +26,20 @@ import { ClientFormModal } from "./client-form-modal";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency, formatDate, formatDateTime, formatMoneyByCurrency } from "@/lib/utils";
 import type { Client, ClientNote, Proposal } from "@/lib/types";
+import type { CampaignListItem } from "@/lib/queries/diagnostics";
+import { CampaignsList } from "@/components/admin/diagnostics/campaigns-list";
+import { NewCampaignButton } from "@/components/admin/diagnostics/new-campaign-modal";
 
 export function ClientDetail({
   client,
   proposals,
+  campaigns,
   notes,
   currentUserId,
 }: {
   client: Client;
   proposals: Proposal[];
+  campaigns: CampaignListItem[];
   notes: ClientNote[];
   currentUserId: string;
 }) {
@@ -192,6 +197,7 @@ export function ClientDetail({
         <Tabs defaultValue="cotizaciones">
           <TabsList>
             <TabsTrigger value="cotizaciones">Cotizaciones</TabsTrigger>
+            <TabsTrigger value="diagnosticos">Diagnósticos 360° ({campaigns.length})</TabsTrigger>
             <TabsTrigger value="notas">Notas</TabsTrigger>
           </TabsList>
 
@@ -223,6 +229,21 @@ export function ClientDetail({
                   ))}
                 </div>
               )}
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="diagnosticos" className="mt-4 space-y-4">
+            {campaigns.length > 0 && (
+              <div className="flex justify-end">
+                <NewCampaignButton fixedClientId={client.id} currentUserId={currentUserId} variant="outline" />
+              </div>
+            )}
+            <Card className="p-0 overflow-hidden">
+              <CampaignsList
+                campaigns={campaigns}
+                showClient={false}
+                emptyAction={<NewCampaignButton fixedClientId={client.id} currentUserId={currentUserId} />}
+              />
             </Card>
           </TabsContent>
 

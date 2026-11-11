@@ -16,6 +16,10 @@ Plataforma SaaS para crear, enviar y dar seguimiento a propuestas comerciales de
    - Políticas de RLS (cada usuario ve solo lo suyo; el rol `admin` ve todo).
    - Funciones `register_proposal_view`, `accept_proposal`, `reject_proposal`, `mark_proposal_sent` (usadas por la landing pública y el panel).
    - El bucket público de Storage `proposal-assets` (logos, fotos, galería).
+
+   Luego ejecuta, en orden, las migraciones siguientes:
+   - [`0002_habilitada_firma.sql`](./supabase/migrations/0002_habilitada_firma.sql)
+   - [`0003_diagnosticos.sql`](./supabase/migrations/0003_diagnosticos.sql): tablas `diagnostic_campaigns` y `diagnostic_responses` del **Diagnóstico 360°**, con RLS y las funciones públicas `get_diagnostic_campaign` y `submit_diagnostic_response`.
 3. En **Authentication → Providers**, deja habilitado el login por correo/contraseña.
 4. Crea tu primer usuario administrador:
    - En **Authentication → Users**, crea un usuario con tu correo.

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { getClientById } from "@/lib/queries/clients";
 import { listProposalsByClient } from "@/lib/queries/proposals";
+import { listCampaigns } from "@/lib/queries/diagnostics";
 import { PageHeader } from "@/components/admin/page-header";
 import { ClientDetail } from "@/components/admin/clients/client-detail";
 import Link from "next/link";
@@ -17,8 +18,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const client = await getClientById(supabase, id);
   if (!client) notFound();
 
-  const [proposals, notesRes] = await Promise.all([
+  const [proposals, campaigns, notesRes] = await Promise.all([
     listProposalsByClient(supabase, id),
+    listCampaigns(supabase, { clientId: id }),
     supabase.from("client_notes").select("*").eq("client_id", id).order("created_at", { ascending: false }),
   ]);
 
@@ -39,6 +41,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       <ClientDetail
         client={client}
         proposals={proposals}
+        campaigns={campaigns}
         notes={notesRes.data ?? []}
         currentUserId={userId}
       />

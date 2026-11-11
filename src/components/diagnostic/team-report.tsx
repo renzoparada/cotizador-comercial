@@ -127,7 +127,7 @@ export function TeamView({ onBack, onOpen }: { onBack: () => void; onOpen: (r: D
   );
 }
 
-function TeamReportView({ responses }: { responses: DiagnosticResponse[] }) {
+export function TeamReportView({ responses }: { responses: DiagnosticResponse[] }) {
   const t = useMemo(() => analyzeTeam(responses), [responses]);
   const hasLevels = t.dimensions.some((d) => d.leadership !== null) && t.dimensions.some((d) => d.team !== null);
 

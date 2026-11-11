@@ -12,10 +12,12 @@ export function AdminShell({ profile, children }: { profile: Profile; children: 
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar role={profile.role} mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
+      <div className="no-print contents">
+        <Sidebar role={profile.role} mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
+      </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-surface/80 glass px-4 sm:px-6">
+        <header className="no-print sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-surface/80 glass px-4 sm:px-6">
           <button
             onClick={() => setMobileOpen(true)}
             className="rounded-lg p-2 text-muted hover:bg-surface-2 lg:hidden"

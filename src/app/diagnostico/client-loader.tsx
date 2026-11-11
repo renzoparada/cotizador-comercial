@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
+import type { CampaignPublic } from "@/lib/diagnostic/types";
 
 // La app vive en el navegador (respuestas en localStorage), por eso se omite el prerender.
 const DiagnosticApp = dynamic(() => import("@/components/diagnostic/diagnostic-app").then((m) => m.DiagnosticApp), {
@@ -13,6 +14,6 @@ const DiagnosticApp = dynamic(() => import("@/components/diagnostic/diagnostic-a
   ),
 });
 
-export function ClientLoader() {
-  return <DiagnosticApp />;
+export function ClientLoader({ campaign }: { campaign?: CampaignPublic }) {
+  return <DiagnosticApp campaign={campaign} />;
 }

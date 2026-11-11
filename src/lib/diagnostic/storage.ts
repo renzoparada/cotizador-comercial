@@ -54,19 +54,22 @@ export function deleteResponse(id: string) {
   write(read().filter((x) => x.id !== id));
 }
 
-export function loadDraft(): DiagnosticResponse | null {
+/** El borrador se guarda por separado para cada campaña (scope = slug) y para el modo libre. */
+const draftKey = (scope?: string) => (scope ? `${DRAFT_KEY}.${scope}` : DRAFT_KEY);
+
+export function loadDraft(scope?: string): DiagnosticResponse | null {
   try {
-    const raw = window.localStorage.getItem(DRAFT_KEY);
+    const raw = window.localStorage.getItem(draftKey(scope));
     return raw ? (JSON.parse(raw) as DiagnosticResponse) : null;
   } catch {
     return null;
   }
 }
 
-export function saveDraft(r: DiagnosticResponse | null) {
+export function saveDraft(r: DiagnosticResponse | null, scope?: string) {
   try {
-    if (r) window.localStorage.setItem(DRAFT_KEY, JSON.stringify(r));
-    else window.localStorage.removeItem(DRAFT_KEY);
+    if (r) window.localStorage.setItem(draftKey(scope), JSON.stringify(r));
+    else window.localStorage.removeItem(draftKey(scope));
   } catch {
     // ignorar
   }

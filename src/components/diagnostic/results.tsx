@@ -39,7 +39,7 @@ const NAV = [
   ["voz", "Voz del participante"],
 ] as const;
 
-export function Results({ response, onEdit }: { response: DiagnosticResponse; onEdit?: () => void }) {
+export function Results({ response, onEdit, shareable = true, showAi = true, navTop = "top-14" }: { response: DiagnosticResponse; onEdit?: () => void; shareable?: boolean; showAi?: boolean; navTop?: string }) {
   const report = useMemo(() => analyze(response.answers), [response.answers]);
   const { info } = response;
   const levelLabel = LEVELS.find((l) => l.id === info.level)?.label;
@@ -72,9 +72,11 @@ export function Results({ response, onEdit }: { response: DiagnosticResponse; on
               <Pencil className="h-3.5 w-3.5" /> Editar respuestas
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={share}>
-            <Link2 className="h-3.5 w-3.5" /> Compartir respuestas
-          </Button>
+          {shareable && (
+            <Button variant="outline" size="sm" onClick={share}>
+              <Link2 className="h-3.5 w-3.5" /> Compartir respuestas
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => downloadJson(`diagnostico-${slugify(info.company)}-${slugify(info.name || info.role)}.json`, response)}>
             <FileJson className="h-3.5 w-3.5" /> JSON
           </Button>
@@ -85,7 +87,7 @@ export function Results({ response, onEdit }: { response: DiagnosticResponse; on
       </div>
 
       {/* Navegación interna */}
-      <nav className="no-print sticky top-0 z-20 -mx-4 mt-6 overflow-x-auto border-b border-border bg-background/85 px-4 backdrop-blur">
+      <nav className={cn("no-print sticky z-20 -mx-4 mt-6 overflow-x-auto border-b border-border bg-background/85 px-4 backdrop-blur", navTop)}>
         <div className="flex gap-1 py-2">
           {NAV.map(([id, label]) => (
             <a key={id} href={`#${id}`} className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-foreground">
@@ -368,7 +370,7 @@ export function Results({ response, onEdit }: { response: DiagnosticResponse; on
           </div>
         </ReportSection>
 
-        <AiReport report={report} info={info} />
+        {showAi && <AiReport report={report} info={info} />}
 
         <p className="border-t border-border pt-6 text-xs text-muted">
           Este informe es un diagnóstico preliminar basado en percepciones, sin información financiera. No evalúa personas: busca comprender la
