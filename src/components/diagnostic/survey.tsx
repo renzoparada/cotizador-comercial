@@ -15,12 +15,14 @@ export function Survey({
   onFinish,
   onBack,
   initialStep = 0,
+  finishLabel = "Ver diagnóstico",
 }: {
   answers: Answers;
   onChange: (qid: string, a: Answer) => void;
   onFinish: () => void;
   onBack: () => void;
   initialStep?: number;
+  finishLabel?: string;
 }) {
   const [step, setStep] = useState(initialStep);
   const [showMissing, setShowMissing] = useState(false);
@@ -134,7 +136,7 @@ export function Survey({
               <Button onClick={next} size="lg">
                 {last ? (
                   <>
-                    <Sparkles className="h-4 w-4" /> Ver diagnóstico
+                    <Sparkles className="h-4 w-4" /> {finishLabel}
                   </>
                 ) : (
                   <>

@@ -31,7 +31,7 @@ import { Results } from "./results";
 import { TeamView } from "./team-report";
 import { scoreColor } from "./report-parts";
 
-type View = "home" | "info" | "survey" | "results" | "team";
+type View = "home" | "info" | "survey" | "results" | "thanks" | "team";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -53,7 +53,7 @@ export function DiagnosticApp({ campaign }: { campaign?: CampaignPublic }) {
   const [draft, setDraft] = useState<DiagnosticResponse | null>(() => loadDraft(scope));
   const [view, setView] = useState<View>(() => {
     const d = loadDraft(scope);
-    if (campaign && d?.completedAt) return "results";
+    if (campaign && d?.completedAt) return "thanks";
     return presetCompany && !d && !campaign ? "info" : "home";
   });
   const [current, setCurrent] = useState<DiagnosticResponse>(() => loadDraft(scope) ?? emptyResponse(presetCompany));
@@ -118,7 +118,6 @@ export function DiagnosticApp({ campaign }: { campaign?: CampaignPublic }) {
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error ?? "No se pudieron enviar las respuestas.");
       setSync({ state: "sent" });
-      toast.success("¡Respuestas enviadas!", { description: "Gracias por su participación." });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "No se pudieron enviar las respuestas.";
       setSync({ state: "error", error: msg });
@@ -138,7 +137,8 @@ export function DiagnosticApp({ campaign }: { campaign?: CampaignPublic }) {
       setDraft(null);
     }
     setCurrent(done);
-    setView("results");
+    // En una campaña el participante no ve resultados: solo el consultor, desde el panel.
+    setView(campaign ? "thanks" : "results");
   };
 
   return (
@@ -174,9 +174,6 @@ export function DiagnosticApp({ campaign }: { campaign?: CampaignPublic }) {
         </div>
       )}
 
-      {campaign && view === "results" && (
-        <SyncBanner sync={sync} onRetry={() => submit(current)} />
-      )}
 
       {view === "home" && (
         <Home
@@ -186,7 +183,7 @@ export function DiagnosticApp({ campaign }: { campaign?: CampaignPublic }) {
           onStart={() => start(presetCompany)}
           onResume={() => {
             if (draft) setCurrent(draft);
-            if (campaign && draft?.completedAt) setView("results");
+            if (campaign && draft?.completedAt) setView("thanks");
             else setView(draft?.info.company && draft.info.level ? "survey" : "info");
           }}
           onOpen={(r) => {
@@ -197,10 +194,11 @@ export function DiagnosticApp({ campaign }: { campaign?: CampaignPublic }) {
         />
       )}
       {view === "info" && <InfoForm lockCompany={!!campaign} info={current.info} onChange={(info) => update({ ...current, info })} onNext={() => setView("survey")} onBack={() => setView("home")} />}
-      {view === "survey" && <Survey answers={current.answers} onChange={setAnswer} onFinish={finish} onBack={() => setView("info")} />}
-      {view === "results" && (
-        <Results response={current} shareable={!campaign} onEdit={!campaign || campaign.abierta ? () => setView("survey") : undefined} />
+      {view === "survey" && (
+        <Survey answers={current.answers} onChange={setAnswer} onFinish={finish} onBack={() => setView("info")} finishLabel={campaign ? "Enviar respuestas" : undefined} />
       )}
+      {view === "results" && !campaign && <Results response={current} onEdit={() => setView("survey")} />}
+      {view === "thanks" && campaign && <ThankYou sync={sync} onRetry={() => submit(current)} />}
       {view === "team" && !campaign && (
         <TeamView
           onBack={() => setView("home")}
@@ -271,7 +269,7 @@ function Home({
           <div className="mt-8 flex flex-wrap gap-3">
             {campaign && draft?.completedAt ? (
               <Button size="lg" onClick={onResume}>
-                <FileText className="h-4 w-4" /> Ver mi informe
+                <CheckCircle2 className="h-4 w-4" /> Ya respondió este diagnóstico
               </Button>
             ) : draft && Object.keys(draft.answers).length > 0 ? (
               <>
@@ -473,43 +471,36 @@ function L({ label, children, className, as = "label" }: { label: string; childr
   );
 }
 
-function SyncBanner({ sync, onRetry }: { sync: Sync; onRetry: () => void }) {
-  if (sync.state === "idle") return null;
+function ThankYou({ sync, onRetry }: { sync: Sync; onRetry: () => void }) {
   return (
-    <div className="no-print mx-auto mt-6 max-w-6xl px-4">
-      <div
-        className={cn(
-          "flex flex-wrap items-center gap-3 rounded-card border p-4 text-sm",
-          sync.state === "sent" && "border-success/40 bg-success/10",
-          sync.state === "sending" && "border-border bg-surface",
-          sync.state === "error" && "border-danger/40 bg-danger/10",
-        )}
-      >
-        {sync.state === "sending" && (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" /> Enviando sus respuestas…
-          </>
-        )}
-        {sync.state === "sent" && (
-          <>
-            <CheckCircle2 className="h-4 w-4 text-success" />
-            <span>
-              <strong>Respuestas enviadas al consultor.</strong> Puede revisar su informe individual abajo y corregir respuestas mientras el diagnóstico
-              siga abierto.
-            </span>
-          </>
-        )}
-        {sync.state === "error" && (
-          <>
-            <span className="flex-1">
-              <strong>No se pudieron enviar sus respuestas.</strong> {sync.error} Sus respuestas siguen guardadas en este dispositivo.
-            </span>
-            <Button size="sm" variant="outline" onClick={onRetry}>
-              <RotateCw className="h-3.5 w-3.5" /> Reintentar
-            </Button>
-          </>
-        )}
-      </div>
+    <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col items-center justify-center px-4 py-16 text-center">
+      {sync.state === "error" ? (
+        <>
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-danger/10 text-danger">
+            <RotateCw className="h-7 w-7" />
+          </span>
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">No pudimos enviar sus respuestas</h1>
+          <p className="mt-3 text-muted">{sync.error} Sus respuestas siguen guardadas en este dispositivo; inténtelo nuevamente.</p>
+          <Button size="lg" className="mt-8" onClick={onRetry}>
+            <RotateCw className="h-4 w-4" /> Reintentar envío
+          </Button>
+        </>
+      ) : sync.state === "sending" ? (
+        <>
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="mt-6 text-muted">Enviando sus respuestas…</p>
+        </>
+      ) : (
+        <>
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success">
+            <CheckCircle2 className="h-8 w-8" />
+          </span>
+          <h1 className="mt-6 text-3xl font-semibold tracking-tight sm:text-4xl">¡Gracias por responder!</h1>
+          <p className="mt-4 text-lg text-muted">Sus respuestas fueron recibidas correctamente.</p>
+          <p className="mt-2 text-lg text-muted">Le enviaremos sus resultados en la próxima sesión.</p>
+          <p className="mt-8 text-sm text-muted">Ya puede cerrar esta ventana.</p>
+        </>
+      )}
     </div>
   );
 }
