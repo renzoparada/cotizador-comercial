@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   const service = createServiceClient();
   const { data, error } = await service.auth.admin.inviteUserByEmail(email.trim(), {
     data: { full_name: fullName || email.split("@")[0], role: role ?? "vendedor" },
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/login`,
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "") || new URL(request.url).origin}/login`,
   });
 
   if (error) {

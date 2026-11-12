@@ -10,7 +10,7 @@ import { Input, Label, Select, Textarea } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 
 export function campaignUrl(slug: string) {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? (typeof window !== "undefined" ? window.location.origin : "");
+  const base = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "") || (typeof window !== "undefined" ? window.location.origin : "");
   return `${base}/diagnostico/${slug}`;
 }
 

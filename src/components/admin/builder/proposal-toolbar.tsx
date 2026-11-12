@@ -38,7 +38,7 @@ export function ProposalToolbar({
   const [deleting, setDeleting] = useState(false);
 
   const publicUrl =
-    (process.env.NEXT_PUBLIC_SITE_URL ?? (typeof window !== "undefined" ? window.location.origin : "")) +
+    (process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "") || (typeof window !== "undefined" ? window.location.origin : "")) +
     `/cotizacion/${slug}`;
 
   async function handleSend() {
